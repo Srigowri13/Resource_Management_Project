@@ -1,11 +1,14 @@
 <?php
 include 'config/database.php';
+$pageTitle = "Register";
+include 'header.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get form data
     $username = $_POST['username'];
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $role = $_POST['role'];
 
     // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -25,13 +28,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-
     // Insert user into database
-    $insertQuery = "INSERT INTO users (user_name, email, password) VALUES (?, ?, ?)";
+    $insertQuery = "INSERT INTO users (user_name, email, password, role) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($insertQuery);
-    $stmt->bind_param("sss", $username, $email, $password);
+    $stmt->bind_param("ssss", $username, $email, $password, $role);
     if ($stmt->execute()) {
-        echo "User registered successfully.";
+        echo '<script type="text/javascript">
+        window.onload = function () { alert("User registered successfully."); }
+        </script>';
+        header('Location: login.php');
+        exit();
     } else {
         echo "Error registering user: " . $stmt->error;
     }
@@ -44,66 +50,84 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $conn->close();
 ?>
 
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Resource Management Project</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href='https://fonts.googleapis.com/css?family=Barlow' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #EEEEEE;
+            font-family: 'Barlow';
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .box {
+            background-color: #333;
+            border-style: none;
+            border-radius: 7.5px;
+            width: 25%;
+            color: #C73659;
+            padding: 10px 30px 10px 30px;
+            margin: 25px;
+            font-size: 30px;
+        }
+
+        .inner-box {
+            background-color: #333;
+            padding: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 15px;
+            margin-bottom: 0px;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 0px;
+        }
+
+        button {
+            padding: 10px 20px 10px 20px;
+            background-color: #C73659;
+            border-style: none;
+            border-radius: 5px;
+            color: #EEEEEE;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #b53250;
+        }
+    </style>
 </head>
 <body>
-    <form action="register.php" method="POST">
-        <section class="vh-100 gradient-custom">
-            <div class="container py-5 h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                <div class="card bg-dark text-white" style="border-radius: 1rem;">
-                    <div class="card-body p-5 text-center">
-        
-                    <div class="mb-md-5 mt-md-4 pb-5">
-        
-                        <h2 class="fw-bold mb-2 text-uppercase">Register</h2>
-                        <p class="text-white-50 mb-5">Please enter your username, email and password!</p>
-                                
-                        <div class="form-outline form-white mb-4">
-                        <input type="text" id="username" class="form-control form-control-lg" name="username" required/>
-                        <label class="form-label" for="username">Username</label>
-                        </div>
-        
-                        <div class="form-outline form-white mb-4">
-                        <input type="email" id="typeEmailX" class="form-control form-control-lg" name="email" required/>
-                        <label class="form-label" for="typeEmailX">Email</label>
-                        </div>
-        
-                        <div class="form-outline form-white mb-4">
-                        <input type="password" id="typePasswordX" class="form-control form-control-lg" name="password" required/>
-                        <label class="form-label" for="typePasswordX">Password</label>
-                        </div>
-        
-                        <p class="small mb-5 pb-lg-2"><a class="text-white-50" href="#!">Forgot password?</a></p>
-        
-                        <button class="btn btn-outline-light btn-lg px-5" type="submit">Register</button>
-        
-                        <div class="d-flex justify-content-center text-center mt-4 pt-1">
-                        <a href="#!" class="text-white"><i class="fab fa-facebook-f fa-lg"></i></a>
-                        <a href="#!" class="text-white"><i class="fab fa-twitter fa-lg mx-4 px-2"></i></a>
-                        <a href="#!" class="text-white"><i class="fab fa-google fa-lg"></i></a>
-                        </div>
-        
-                    </div>
-        
-                    <div>
-                        <p class="mb-0">Don't have an account? <a href="#" class="text-white-50 fw-bold">Sign Up</a>
-                        </p>
-                    </div>
-        
-                    </div>
-                </div>
-                </div>
+    <center>
+        <div class="box">
+            <h2>Register</h2>
+            <div class="inner-box">
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <input type="text" id="username" name="username" placeholder="Username" required><br><br>
+                    <input type="email" id="email" name="email" placeholder="Email" required><br><br>
+                    <input type="password" id="password" name="password" placeholder="Password" required><br><br>
+                    <select name="role" id="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select><br><br>
+                    <button type="submit" name="register">Register</button>
+                </form>
             </div>
-            </div>
-        </section>
-    </form>
+        </div>
+    </center>
 </body>
 </html>
+
+<?php
+include 'footer.php';
+?>
